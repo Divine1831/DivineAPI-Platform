@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Details | DivineAPI</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#080d18;color:#e8eefc;font-family:Arial,sans-serif}
+    header{padding:20px 7%;border-bottom:1px solid #202b40;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:23px;font-weight:bold;color:#60a5fa}
+    a{color:#60a5fa;text-decoration:none}
+    main{max-width:950px;margin:45px auto;padding:20px}
+    .card{background:#111a2b;border:1px solid #25344d;border-radius:15px;padding:25px;margin-bottom:20px}
+    .tag{display:inline-block;background:#123c30;color:#6ee7b7;padding:7px 12px;border-radius:20px;font-size:12px}
+    h1{font-size:32px;margin:15px 0}
+    h2{font-size:19px;margin-top:0}
+    p{color:#aab8d0;line-height:1.7}
+    .detail{padding:13px 0;border-bottom:1px solid #26334a}
+    .detail:last-child{border:0}
+    .label{color:#8798b5;font-size:12px;margin-bottom:7px}
+    code{background:#080d18;padding:4px 7px;border-radius:5px;color:#93c5fd;overflow-wrap:anywhere}
+    pre{background:#080d18;padding:18px;border-radius:10px;overflow:auto;color:#a7f3d0;line-height:1.6}
+    button{background:#2563eb;color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer}
+    button:hover{background:#1d4ed8}
+    .muted{color:#8998b0;font-size:13px}
+    #message{color:#fca5a5}
+    @media(max-width:600px){main{margin:20px auto}h1{font-size:25px}header{padding:17px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">DivineAPI</div>
+  <a href="index.html">← Back to dashboard</a>
+</header>
+
+<main>
+  <div id="message">Loading API details...</div>
+
+  <section id="content" hidden>
+    <div class="card">
+      <span class="tag" id="status">Approved</span>
+      <h1 id="name">API Name</h1>
+      <p id="description"></p>
+      <p class="muted" id="category"></p>
+    </div>
+
+    <div class="card">
+      <h2>API Information</h2>
+      <div class="detail"><div class="label">Base URL</div><code id="baseUrl"></code></div>
+      <div class="detail"><div class="label">Version</div><span id="version"></span></div>
+      <div class="detail"><div class="label">Authentication</div><span id="auth"></span></div>
+      <div class="detail"><div class="label">API Slug</div><code id="slug"></code></div>
+    </div>
+
+    <div class="card">
+      <h2>Quick Start</h2>
+      <p>Use the API's base URL and follow the provider's documentation to make requests.</p>
+      <pre id="example"></pre>
+      <button id="copyButton">Copy example</button>
+      <p class="muted">This is a request template, not a guarantee that the sample endpoint is operational.</p>
+    </div>
+
+    <div class="card">
+      <h2>Documentation</h2>
+      <p id="docsText">The provider has not added detailed documentation yet.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const API_BASE = "https://divine-api-seven.vercel.app";
+
+const $ = id => document.getElementById(id);
+const slug = new URLSearchParams(location.search).get("slug");
+
+function showError(message) {
+  $("message").textContent = message;
+}
+
+async function loadApi() {
+  if (!slug) {
+    showError("No API slug was provided. Open this page from a marketplace API listing.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/api/marketplace/apis/${encodeURIComponent(slug)}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Could not load this API.");
+    }
+
+    const api = data.api || data.data || data;
+
+    $("name").textContent = api.name || "Unnamed API";
+    $("description").textContent = api.description || "No description provided.";
+    $("category").textContent = "Category: " + (api.category || "Uncategorised");
+    $("baseUrl").textContent = api.base_url || "Not provided";
+    $("version").textContent = api.version || "1.0.0";
+    $("auth").textContent = api.auth_type || "None";
+    $("slug").textContent = api.slug || slug;
+    $("status").textContent = api.status || "Approved";
+
+    $("example").textContent =
+`fetch("${api.base_url || "YOUR_API_BASE_URL"}/YOUR_ENDPOINT")
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error(error));`;
+
+    $("content").hidden = false;
+    $("message").hidden = true;
+
+  } catch (error) {
+    showError(error.message || "Unable to load API details.");
+  }
+}
+
+$("copyButton").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("example").textContent);
+    $("copyButton").textContent = "Copied!";
+    setTimeout(() => $("copyButton").textContent = "Copy example", 1500);
+  } catch {
+    $("copyButton").textContent = "Copy unavailable";
+  }
+});
+
+loadApi();
+</script>
+</body>
+</html>
