@@ -543,6 +543,7 @@ document.querySelectorAll("[data-go]").forEach(button => {
   });
 });
 
+/* UPDATED MARKETPLACE API CARD */
 function renderApiCard(api, includeActions = true) {
   const card = document.createElement("article");
   card.className = "api-card";
@@ -559,13 +560,13 @@ function renderApiCard(api, includeActions = true) {
   description.className = "api-description";
   description.textContent = api.description || "No description supplied.";
 
-  titleBox.append(title,description);
+  titleBox.append(title, description);
 
   const status = document.createElement("span");
   status.className = "status " + (api.status || "Pending");
   status.textContent = api.status || "Pending";
 
-  top.append(titleBox,status);
+  top.append(titleBox, status);
 
   const meta = document.createElement("div");
   meta.className = "api-meta";
@@ -597,7 +598,7 @@ function renderApiCard(api, includeActions = true) {
     approve.textContent = "Approve";
 
     approve.addEventListener("click", () => {
-      moderate(api.id,"approve",approve);
+      moderate(api.id, "approve", approve);
     });
 
     const reject = document.createElement("button");
@@ -605,13 +606,27 @@ function renderApiCard(api, includeActions = true) {
     reject.textContent = "Reject";
 
     reject.addEventListener("click", () => {
-      moderate(api.id,"reject",reject);
+      moderate(api.id, "reject", reject);
     });
 
-    actions.append(approve,reject);
+    actions.append(approve, reject);
   }
 
-  card.append(top,meta,actions);
+  // Only approved APIs get a public details-page link.
+  if (!includeActions && api.status === "Approved" && api.slug) {
+    const open = document.createElement("button");
+    open.className = "small-btn approve";
+    open.textContent = "Open API page";
+
+    open.addEventListener("click", () => {
+      window.location.href =
+        "api-details.html?slug=" + encodeURIComponent(api.slug);
+    });
+
+    actions.appendChild(open);
+  }
+
+  card.append(top, meta, actions);
   return card;
 }
 
