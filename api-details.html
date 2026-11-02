@@ -1,10 +1,11 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>API Details | DivineAPI</title>
+
   <style>
     *{box-sizing:border-box}
     body{margin:0;background:#080d18;color:#e8eefc;font-family:Arial,sans-serif}
@@ -16,19 +17,36 @@
     .tag{display:inline-block;background:#123c30;color:#6ee7b7;padding:7px 12px;border-radius:20px;font-size:12px}
     h1{font-size:32px;margin:15px 0}
     h2{font-size:19px;margin-top:0}
+    h3{font-size:17px;margin:0 0 12px}
     p{color:#aab8d0;line-height:1.7}
     .detail{padding:13px 0;border-bottom:1px solid #26334a}
     .detail:last-child{border:0}
     .label{color:#8798b5;font-size:12px;margin-bottom:7px}
     code{background:#080d18;padding:4px 7px;border-radius:5px;color:#93c5fd;overflow-wrap:anywhere}
-    pre{background:#080d18;padding:18px;border-radius:10px;overflow:auto;color:#a7f3d0;line-height:1.6}
-    button{background:#2563eb;color:white;border:0;padding:11px 16px;border-radius:8px;cursor:pointer}
+    pre{background:#080d18;padding:18px;border-radius:10px;overflow:auto;color:#a7f3d0;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+    button{background:#2563eb;color:white;border:0;padding:10px 15px;border-radius:8px;cursor:pointer}
     button:hover{background:#1d4ed8}
     .muted{color:#8998b0;font-size:13px}
     #message{color:#fca5a5}
-    @media(max-width:600px){main{margin:20px auto}h1{font-size:25px}header{padding:17px}}
+    .endpoint{border:1px solid #293953;background:#0c1423;border-radius:12px;padding:20px;margin-top:18px}
+    .endpoint-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+    .method{font-size:12px;font-weight:bold;padding:7px 10px;border-radius:6px;background:#123c30;color:#6ee7b7}
+    .endpoint-path{font-size:14px}
+    .parameter{padding:12px 0;border-bottom:1px solid #26334a}
+    .parameter:last-child{border:0}
+    .required{color:#fca5a5;font-size:11px;margin-left:7px}
+    .section-label{color:#8798b5;font-size:12px;margin:20px 0 8px}
+    .empty{background:#0c1423;border:1px dashed #35445d;padding:20px;border-radius:10px;color:#8998b0}
+    .copy-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    @media(max-width:600px){
+      main{margin:20px auto}
+      h1{font-size:25px}
+      header{padding:17px}
+      .card{padding:18px}
+    }
   </style>
 </head>
+
 <body>
 <header>
   <div class="logo">DivineAPI</div>
@@ -39,6 +57,7 @@
   <div id="message">Loading API details...</div>
 
   <section id="content" hidden>
+
     <div class="card">
       <span class="tag" id="status">Approved</span>
       <h1 id="name">API Name</h1>
@@ -48,24 +67,43 @@
 
     <div class="card">
       <h2>API Information</h2>
-      <div class="detail"><div class="label">Base URL</div><code id="baseUrl"></code></div>
-      <div class="detail"><div class="label">Version</div><span id="version"></span></div>
-      <div class="detail"><div class="label">Authentication</div><span id="auth"></span></div>
-      <div class="detail"><div class="label">API Slug</div><code id="slug"></code></div>
+
+      <div class="detail">
+        <div class="label">Base URL</div>
+        <code id="baseUrl"></code>
+      </div>
+
+      <div class="detail">
+        <div class="label">Version</div>
+        <span id="version"></span>
+      </div>
+
+      <div class="detail">
+        <div class="label">Authentication</div>
+        <span id="auth"></span>
+      </div>
+
+      <div class="detail">
+        <div class="label">API Slug</div>
+        <code id="slug"></code>
+      </div>
     </div>
 
     <div class="card">
       <h2>Quick Start</h2>
-      <p>Use the API's base URL and follow the provider's documentation to make requests.</p>
+      <p>Use the API's base URL and follow the provider's endpoint documentation.</p>
       <pre id="example"></pre>
       <button id="copyButton">Copy example</button>
-      <p class="muted">This is a request template, not a guarantee that the sample endpoint is operational.</p>
+      <p class="muted">This is a request template. It does not guarantee that the API service is operational.</p>
     </div>
 
     <div class="card">
-      <h2>Documentation</h2>
-      <p id="docsText">The provider has not added detailed documentation yet.</p>
+      <h2>API Documentation</h2>
+      <p class="muted">Explore the endpoints published by this API provider.</p>
+      <div id="docsText">Loading endpoint documentation...</div>
+      <div id="endpoints"></div>
     </div>
+
   </section>
 </main>
 
@@ -77,6 +115,154 @@ const slug = new URLSearchParams(location.search).get("slug");
 
 function showError(message) {
   $("message").textContent = message;
+}
+
+async function copyText(text, button) {
+  const original = button.textContent;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "Copied!";
+  } catch {
+    button.textContent = "Copy unavailable";
+  }
+
+  setTimeout(() => {
+    button.textContent = original;
+  }, 1500);
+}
+
+function createCodeBlock(title, value) {
+  const wrapper = document.createElement("div");
+
+  const heading = document.createElement("div");
+  heading.className = "copy-row";
+
+  const label = document.createElement("div");
+  label.className = "section-label";
+  label.textContent = title;
+
+  const button = document.createElement("button");
+  button.textContent = "Copy JSON";
+
+  const pre = document.createElement("pre");
+  const json = JSON.stringify(value ?? {}, null, 2);
+  pre.textContent = json;
+
+  button.addEventListener("click", () => copyText(json, button));
+
+  heading.append(label, button);
+  wrapper.append(heading, pre);
+
+  return wrapper;
+}
+
+function renderEndpoints(endpoints) {
+  const container = $("endpoints");
+  container.replaceChildren();
+
+  if (!Array.isArray(endpoints) || endpoints.length === 0) {
+    $("docsText").textContent =
+      "The provider has not added endpoint documentation yet.";
+    return;
+  }
+
+  $("docsText").textContent =
+    endpoints.length + " documented endpoint(s) available.";
+
+  endpoints.forEach(endpoint => {
+    const card = document.createElement("div");
+    card.className = "endpoint";
+
+    const top = document.createElement("div");
+    top.className = "endpoint-top";
+
+    const method = document.createElement("span");
+    method.className = "method";
+    method.textContent = endpoint.method || "GET";
+
+    const path = document.createElement("code");
+    path.className = "endpoint-path";
+    path.textContent = endpoint.path || "/";
+
+    const copyPath = document.createElement("button");
+    copyPath.textContent = "Copy path";
+    copyPath.addEventListener("click", () =>
+      copyText(endpoint.path || "/", copyPath)
+    );
+
+    top.append(method, path, copyPath);
+
+    const name = document.createElement("h3");
+    name.textContent = endpoint.name || "Unnamed endpoint";
+
+    const description = document.createElement("p");
+    description.textContent =
+      endpoint.description || "No description provided.";
+
+    card.append(top, name, description);
+
+    const parameters = Array.isArray(endpoint.parameters)
+      ? endpoint.parameters
+      : [];
+
+    const parameterHeading = document.createElement("div");
+    parameterHeading.className = "section-label";
+    parameterHeading.textContent = "PARAMETERS";
+    card.append(parameterHeading);
+
+    if (parameters.length === 0) {
+      const none = document.createElement("p");
+      none.className = "muted";
+      none.textContent = "No parameters documented.";
+      card.append(none);
+    } else {
+      parameters.forEach(parameter => {
+        const item = document.createElement("div");
+        item.className = "parameter";
+
+        const parameterName = document.createElement("strong");
+        parameterName.textContent = parameter.name || "Unnamed";
+
+        const type = document.createElement("span");
+        type.className = "muted";
+        type.textContent = " · " + (parameter.type || "string");
+
+        item.append(parameterName, type);
+
+        if (parameter.required) {
+          const required = document.createElement("span");
+          required.className = "required";
+          required.textContent = "REQUIRED";
+          item.append(required);
+        }
+
+        const detail = document.createElement("p");
+        detail.className = "muted";
+        detail.textContent =
+          parameter.description || "No parameter description.";
+
+        item.append(detail);
+        card.append(item);
+      });
+    }
+
+    if (endpoint.request_example !== null &&
+        endpoint.request_example !== undefined) {
+      card.append(
+        createCodeBlock("REQUEST EXAMPLE", endpoint.request_example)
+      );
+    }
+
+    if (endpoint.response_example !== null &&
+        endpoint.response_example !== undefined) {
+      card.append(
+        createCodeBlock("RESPONSE EXAMPLE", endpoint.response_example)
+      );
+    }
+
+    container.append(card);
+  });
 }
 
 async function loadApi() {
@@ -93,14 +279,16 @@ async function loadApi() {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.message || "Could not load this API.");
+      throw new Error(data.message || data.error || "Could not load this API.");
     }
 
     const api = data.api || data.data || data;
 
     $("name").textContent = api.name || "Unnamed API";
-    $("description").textContent = api.description || "No description provided.";
-    $("category").textContent = "Category: " + (api.category || "Uncategorised");
+    $("description").textContent =
+      api.description || "No description provided.";
+    $("category").textContent =
+      "Category: " + (api.category || "Uncategorised");
     $("baseUrl").textContent = api.base_url || "Not provided";
     $("version").textContent = api.version || "1.0.0";
     $("auth").textContent = api.auth_type || "None";
@@ -116,22 +304,41 @@ async function loadApi() {
     $("content").hidden = false;
     $("message").hidden = true;
 
+    await loadEndpointDocumentation();
+
   } catch (error) {
     showError(error.message || "Unable to load API details.");
   }
 }
 
-$("copyButton").addEventListener("click", async () => {
+async function loadEndpointDocumentation() {
+  $("docsText").textContent = "Loading endpoint documentation...";
+
   try {
-    await navigator.clipboard.writeText($("example").textContent);
-    $("copyButton").textContent = "Copied!";
-    setTimeout(() => $("copyButton").textContent = "Copy example", 1500);
-  } catch {
-    $("copyButton").textContent = "Copy unavailable";
+    const response = await fetch(
+      `${API_BASE}/api/marketplace/apis/${encodeURIComponent(slug)}/endpoints`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || data.error || "Could not load endpoint documentation.");
+    }
+
+    renderEndpoints(data.endpoints || []);
+
+  } catch (error) {
+    $("docsText").textContent =
+      "Unable to load endpoint documentation: " + error.message;
   }
+}
+
+$("copyButton").addEventListener("click", () => {
+  copyText($("example").textContent, $("copyButton"));
 });
 
 loadApi();
 </script>
 </body>
 </html>
+```
