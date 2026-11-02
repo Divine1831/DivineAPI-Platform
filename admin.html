@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1020">
+<title>DivineAPI — Admin Control Center</title>
+
+<style>
+:root {
+  --bg:#0b1020;
+  --panel:#111a2e;
+  --panel2:#17223a;
+  --border:#26334d;
+  --text:#edf3ff;
+  --muted:#91a0ba;
+  --blue:#4385ff;
+  --green:#20c987;
+  --red:#ff647c;
+  --yellow:#f5bd4f;
+  --shadow:0 12px 35px #0003;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,Arial,sans-serif;
+}
+button,input,select {font:inherit}
+button {cursor:pointer}
+.layout {display:flex;min-height:100vh}
+.sidebar {
+  width:255px;
+  background:#0e172a;
+  border-right:1px solid var(--border);
+  padding:25px 17px;
+  position:fixed;
+  inset:0 auto 0 0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+}
+.brand {
+  display:flex;align-items:center;gap:12px;
+  padding:5px 9px 30px;
+}
+.brand-icon {
+  width:42px;height:42px;border-radius:13px;
+  background:linear-gradient(135deg,#3988ff,#7759ed);
+  display:grid;place-items:center;font-weight:900;font-size:20px;
+}
+.brand h2 {font-size:18px;margin:0}
+.brand small {color:var(--muted)}
+.nav-label {
+  color:#687995;font-size:11px;font-weight:800;
+  letter-spacing:1.5px;padding:15px 12px 8px;
+}
+.nav-btn {
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-radius:10px;
+  color:#aab8d0;background:none;border:0;
+  width:100%;text-align:left;margin:3px 0;
+}
+.nav-btn:hover,.nav-btn.active {
+  color:white;background:#1c3153;
+}
+.nav-btn.active {box-shadow:inset 3px 0 var(--blue)}
+.nav-icon {width:20px;text-align:center}
+.sidebar-bottom {margin-top:auto}
+.admin-profile {
+  display:flex;align-items:center;gap:11px;
+  padding:15px 8px;border-top:1px solid var(--border);
+}
+.avatar {
+  width:39px;height:39px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#4385ff,#8a5cf6);
+  font-weight:bold;
+}
+.admin-profile strong {font-size:13px}
+.admin-profile small {display:block;color:var(--muted);margin-top:4px}
+.main {margin-left:255px;width:calc(100% - 255px);min-width:0}
+.topbar {
+  height:76px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 34px;gap:15px;background:#0d1527;
+  position:sticky;top:0;z-index:4;
+}
+.topbar h2 {font-size:17px;margin:0}
+.top-actions {display:flex;gap:10px;align-items:center}
+.icon-btn,.secondary {
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--text);padding:10px 13px;border-radius:9px;
+}
+.content {padding:30px;max-width:1500px;margin:auto}
+.page-heading {
+  display:flex;justify-content:space-between;
+  align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:25px;
+}
+.page-heading h1 {font-size:27px;margin:0 0 8px}
+.page-heading p {color:var(--muted);margin:0;font-size:13px}
+.primary {
+  background:var(--blue);color:white;border:0;
+  border-radius:9px;padding:12px 16px;font-weight:700;
+}
+.primary:hover {filter:brightness(1.12)}
+.stats {
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:16px;margin-bottom:23px;
+}
+.stat-card,.panel {
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:15px;padding:20px;box-shadow:var(--shadow);
+}
+.stat-top {display:flex;justify-content:space-between;align-items:center}
+.stat-label {font-size:13px;color:var(--muted)}
+.stat-icon {
+  width:37px;height:37px;border-radius:11px;
+  display:grid;place-items:center;background:#233b62;
+}
+.stat-number {font-size:30px;font-weight:800;margin:16px 0 5px}
+.stat-note {font-size:12px;color:var(--muted)}
+.blue {color:#6da2ff}
+.green {color:var(--green)}
+.red {color:var(--red)}
+.yellow {color:var(--yellow)}
+.dashboard-grid {
+  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);
+  gap:18px;margin-bottom:20px;
+}
+.panel-heading {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;margin-bottom:17px;
+}
+.panel-heading h3 {margin:0;font-size:16px}
+.panel-heading p {margin:6px 0 0;color:var(--muted);font-size:12px}
+.activity-item {
+  display:flex;gap:12px;padding:13px 0;
+  border-bottom:1px solid var(--border);
+}
+.activity-item:last-child {border:0}
+.activity-dot {
+  width:9px;height:9px;border-radius:50%;
+  background:var(--blue);margin-top:5px;flex-shrink:0;
+}
+.activity-item p {margin:0;font-size:13px;line-height:1.5}
+.activity-item small {color:var(--muted);font-size:11px}
+.toolbar {
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;
+}
+.search {
+  flex:1;min-width:180px;background:#0c1425;
+  border:1px solid var(--border);color:var(--text);
+  border-radius:9px;padding:11px 13px;outline:none;
+}
+.search:focus,select:focus {border-color:var(--blue)}
+select {
+  background:#0c1425;color:var(--text);
+  border:1px solid var(--border);border-radius:9px;
+  padding:11px;outline:none;
+}
+.api-list {display:grid;gap:12px}
+.api-card {
+  background:#0d1628;border:1px solid var(--border);
+  border-radius:12px;padding:17px;
+}
+.api-card-top {
+  display:flex;justify-content:space-between;
+  align-items:flex-start;gap:12px;
+}
+.api-card h4 {margin:0 0 7px;font-size:15px}
+.api-description {color:var(--muted);font-size:13px;line-height:1.6}
+.api-meta {
+  display:flex;gap:8px;flex-wrap:wrap;
+  color:var(--muted);font-size:11px;margin-top:12px;
+}
+.tag {
+  padding:5px 9px;border-radius:20px;
+  background:#26364f;color:#b9c9e5;font-size:11px;
+}
+.status {
+  padding:6px 9px;border-radius:20px;
+  font-size:11px;font-weight:800;white-space:nowrap;
+}
+.status.Pending {background:#4c3c1e;color:#ffd16b}
+.status.Approved {background:#123e34;color:#5be0ad}
+.status.Rejected {background:#482532;color:#ff8a9d}
+.api-actions {display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.small-btn {
+  padding:9px 12px;border:0;border-radius:8px;
+  color:white;font-size:12px;font-weight:700;
+}
+.approve {background:#16865d}
+.reject {background:#a83d54}
+.details {background:#30496d}
+.empty,.loading {
+  padding:28px;text-align:center;color:var(--muted);
+  border:1px dashed var(--border);border-radius:12px;
+}
+.notice {
+  padding:13px 15px;border-radius:10px;
+  margin-bottom:16px;font-size:13px;display:none;
+}
+.notice.success {display:block;background:#123b30;color:#7de6bb}
+.notice.error {display:block;background:#492532;color:#ff9bac}
+.table-wrap {overflow-x:auto}
+table {width:100%;border-collapse:collapse;min-width:500px}
+th,td {padding:13px 10px;text-align:left;border-bottom:1px solid var(--border);font-size:12px}
+th {color:var(--muted);font-weight:600}
+footer {padding:25px;text-align:center;color:#62718a;font-size:11px}
+.mobile-menu {display:none}
+.modal {
+  position:fixed;inset:0;background:#000a;z-index:20;
+  display:none;align-items:center;justify-content:center;padding:18px;
+}
+.modal.show {display:flex}
+.modal-box {
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;width:min(550px,100%);padding:23px;
+  max-height:85vh;overflow:auto;
+}
+.modal-box h3 {margin-top:0}
+.modal-row {margin:14px 0}
+.modal-row small {color:var(--muted);display:block;margin-bottom:5px}
+.modal-row p {margin:0;overflow-wrap:anywhere;font-size:13px}
+.close-modal {float:right;background:none;border:0;color:white;font-size:23px}
+.hidden {display:none!important}
+
+@media(max-width:1050px) {
+  .stats {grid-template-columns:repeat(2,1fr)}
+  .dashboard-grid {grid-template-columns:1fr}
+}
+@media(max-width:720px) {
+  .sidebar {transform:translateX(-100%);transition:.25s}
+  .sidebar.open {transform:translateX(0)}
+  .main {margin:0;width:100%}
+  .mobile-menu {display:inline-block}
+  .topbar {padding:0 16px;height:65px}
+  .content {padding:20px 14px}
+  .page-heading h1 {font-size:23px}
+}
+@media(max-width:420px) {
+  .stats {grid-template-columns:1fr 1fr;gap:9px}
+  .stat-card {padding:14px}
+  .stat-number {font-size:24px}
+  .stat-label {font-size:11px}
+}
+</style>
+</head>
+
+<body>
+<div class="layout">
+
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-icon">D</div>
+    <div><h2>DivineAPI</h2><small>Control Center</small></div>
+  </div>
+
+  <div class="nav-label">WORKSPACE</div>
+  <button class="nav-btn active" data-section="overview"><span class="nav-icon">▦</span> Overview</button>
+  <button class="nav-btn" data-section="submissions"><span class="nav-icon">◈</span> API submissions</button>
+  <button class="nav-btn" data-section="catalog"><span class="nav-icon">▤</span> Marketplace APIs</button>
+
+  <div class="nav-label">SYSTEM</div>
+  <button class="nav-btn" data-section="activity"><span class="nav-icon">◷</span> Activity</button>
+  <button class="nav-btn" data-section="security"><span class="nav-icon">♙</span> Admin security</button>
+
+  <div class="sidebar-bottom">
+    <button class="nav-btn" id="refreshSidebar"><span class="nav-icon">↻</span> Refresh data</button>
+    <div class="admin-profile">
+      <div class="avatar">A</div>
+      <div><strong id="profileName">Administrator</strong><small id="profileRole">Checking role...</small></div>
+    </div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:13px">
+      <button class="icon-btn mobile-menu" id="menuBtn">☰</button>
+      <h2 id="topTitle">Overview</h2>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="topRefresh" title="Refresh">↻</button>
+      <button class="icon-btn" id="signOutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <div id="notice" class="notice" role="status"></div>
+
+    <section id="overviewSection">
+      <div class="page-heading">
+        <div>
+          <h1>Welcome to DivineAPI</h1>
+          <p>Your marketplace administration overview.</p>
+        </div>
+        <button class="primary" id="overviewRefresh">↻ Refresh dashboard</button>
+      </div>
+
+      <div class="stats">
+        <article class="stat-card">
+          <div class="stat-top"><span class="stat-label">Pending APIs</span><span class="stat-icon yellow">◷</span></div>
+          <div class="stat-number yellow" id="pendingCount">—</div>
+          <div class="stat-note">Awaiting review</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span class="stat-label">Approved APIs</span><span class="stat-icon green">✓</span></div>
+          <div class="stat-number green" id="approvedCount">—</div>
+          <div class="stat-note">Approved submissions</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span class="stat-label">Rejected APIs</span><span class="stat-icon red">×</span></div>
+          <div class="stat-number red" id="rejectedCount">—</div>
+          <div class="stat-note">Rejected submissions</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-top"><span class="stat-label">Total reviewed</span><span class="stat-icon blue">◈</span></div>
+          <div class="stat-number blue" id="totalCount">—</div>
+          <div class="stat-note">Approved + rejected</div>
+        </article>
+      </div>
+
+      <div class="dashboard-grid">
+        <section class="panel">
+          <div class="panel-heading">
+            <div><h3>Review queue</h3><p>API submissions waiting for your decision.</p></div>
+            <button class="secondary" data-go="submissions">View all</button>
+          </div>
+          <div id="overviewPending" class="loading">Loading submissions...</div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div><h3>Admin activity</h3><p>Activity during this browser session.</p></div>
+          </div>
+          <div id="activityFeed"><div class="empty">No activity recorded yet.</div></div>
+        </section>
+      </div>
+    </section>
+
+    <section id="submissionsSection" class="hidden">
+      <div class="page-heading">
+        <div><h1>API submissions</h1><p>Review, approve or reject provider submissions.</p></div>
+        <button class="primary" id="submissionRefresh">↻ Refresh</button>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <input class="search" id="submissionSearch" placeholder="Search API name or description...">
+          <select id="categoryFilter"><option value="">All categories</option></select>
+        </div>
+        <div id="submissionList" class="loading">Loading pending submissions...</div>
+      </div>
+    </section>
+
+    <section id="catalogSection" class="hidden">
+      <div class="page-heading">
+        <div><h1>Marketplace APIs</h1><p>Browse APIs currently approved for public discovery.</p></div>
+        <button class="primary" id="catalogRefresh">↻ Refresh</button>
+      </div>
+      <div class="panel">
+        <div class="toolbar">
+          <input class="search" id="catalogSearch" placeholder="Search marketplace APIs...">
+          <select id="catalogCategory"><option value="">All categories</option></select>
+        </div>
+        <div id="catalogList" class="loading">Loading marketplace...</div>
+      </div>
+    </section>
+
+    <section id="activitySection" class="hidden">
+      <div class="page-heading"><div><h1>Activity log</h1><p>Actions recorded during this admin session.</p></div></div>
+      <div class="panel"><div id="fullActivity"><div class="empty">No activity recorded yet.</div></div></div>
+    </section>
+
+    <section id="securitySection" class="hidden">
+      <div class="page-heading"><div><h1>Admin security</h1><p>Account and access information.</p></div></div>
+      <div class="panel">
+        <h3>Administrator account</h3>
+        <div class="modal-row"><small>Account email</small><p id="securityEmail">Checking...</p></div>
+        <div class="modal-row"><small>Role</small><p id="securityRole">Checking...</p></div>
+        <div class="modal-row"><small>Backend connection</small><p id="connectionStatus">Checking...</p></div>
+        <div class="modal-row"><small>Security reminder</small><p>Your API service-role key must remain on the backend. Never place it in this page or expose it in your frontend repository.</p></div>
+      </div>
+    </section>
+  </main>
+  <footer>DivineAPI Control Center · Secure administration</footer>
+</div>
+</div>
+
+<div class="modal" id="detailsModal">
+  <div class="modal-box">
+    <button class="close-modal" id="closeModal">×</button>
+    <h3>API submission details</h3>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "https://divine-api-seven.vercel.app";
+
+const $ = id => document.getElementById(id);
+let dashboardData = null;
+let pendingApis = [];
+let catalogApis = [];
+let activity = [];
+
+function token() {
+  return sessionStorage.getItem("divineapi_token");
+}
+
+async function request(path, options = {}) {
+  const currentToken = token();
+  if (!currentToken) {
+    throw new Error("You are not signed in. Sign in to DivineAPI first.");
+  }
+
+  const response = await fetch(API_BASE + path, {
+    ...options,
+    headers: {
+      "Authorization": "Bearer " + currentToken,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.success === false) {
+    throw new Error(data.error || "The request could not be completed.");
+  }
+  return data;
+}
+
+function notify(text, type = "success") {
+  $("notice").textContent = text;
+  $("notice").className = "notice " + type;
+  clearTimeout(notify.timer);
+  notify.timer = setTimeout(() => {
+    $("notice").className = "notice";
+  }, 5000);
+}
+
+function addActivity(text) {
+  activity.unshift({text, time:new Date()});
+  activity = activity.slice(0,30);
+  renderActivity();
+}
+
+function renderActivity() {
+  const html = activity.length ? activity.map(item => `
+    <div class="activity-item">
+      <span class="activity-dot"></span>
+      <div><p>${escapeHtml(item.text)}</p><small>${item.time.toLocaleString()}</small></div>
+    </div>
+  `).join("") : '<div class="empty">No activity recorded yet.</div>';
+
+  $("activityFeed").innerHTML = html;
+  $("fullActivity").innerHTML = html;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+function showSection(name) {
+  const sections = ["overview","submissions","catalog","activity","security"];
+  sections.forEach(section => {
+    $(section + "Section").classList.toggle("hidden", section !== name);
+  });
+  document.querySelectorAll(".nav-btn[data-section]").forEach(button => {
+    button.classList.toggle("active", button.dataset.section === name);
+  });
+  $("topTitle").textContent = {
+    overview:"Overview",
+    submissions:"API submissions",
+    catalog:"Marketplace APIs",
+    activity:"Activity log",
+    security:"Admin security"
+  }[name];
+  $("sidebar").classList.remove("open");
+}
+
+document.querySelectorAll("[data-section]").forEach(button => {
+  button.addEventListener("click", () => showSection(button.dataset.section));
+});
+document.querySelectorAll("[data-go]").forEach(button => {
+  button.addEventListener("click", () => showSection(button.dataset.go));
+});
+
+function renderApiCard(api, includeActions = true) {
+  const card = document.createElement("article");
+  card.className = "api-card";
+
+  const top = document.createElement("div");
+  top.className = "api-card-top";
+
+  const titleBox = document.createElement("div");
+  const title = document.createElement("h4");
+  title.textContent = api.name;
+  const description = document.createElement("div");
+  description.className = "api-description";
+  description.textContent = api.description || "No description supplied.";
+  titleBox.append(title,description);
+
+  const status = document.createElement("span");
+  status.className = "status " + (api.status || "Pending");
+  status.textContent = api.status || "Pending";
+  top.append(titleBox,status);
+
+  const meta = document.createElement("div");
+  meta.className = "api-meta";
+  [api.category, "Version " + (api.version || "1.0.0"), "Auth: " + (api.auth_type || "None")].forEach(value => {
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = value;
+    meta.appendChild(tag);
+  });
+
+  const actions = document.createElement("div");
+  actions.className = "api-actions";
+
+  const details = document.createElement("button");
+  details.className = "small-btn details";
+  details.textContent = "View details";
+  details.addEventListener("click", () => showDetails(api));
+  actions.appendChild(details);
+
+  if (includeActions && api.status === "Pending") {
+    const approve = document.createElement("button");
+    approve.className = "small-btn approve";
+    approve.textContent = "Approve";
+    approve.addEventListener("click", () => moderate(api.id,"approve",approve));
+
+    const reject = document.createElement("button");
+    reject.className = "small-btn reject";
+    reject.textContent = "Reject";
+    reject.addEventListener("click", () => moderate(api.id,"reject",reject));
+
+    actions.append(approve,reject);
+  }
+
+  card.append(top,meta,actions);
+  return card;
+}
+
+function showDetails(api) {
+  const fields = [
+    ["Name",api.name],["Description",api.description],
+    ["Category",api.category],["Base URL",api.base_url],
+    ["Version",api.version],["Authentication",api.auth_type],
+    ["Status",api.status],["Submission date",api.created_at]
+  ];
+
+  $("modalContent").replaceChildren();
+  fields.forEach(([label,value]) => {
+    const row = document.createElement("div");
+    row.className = "modal-row";
+    const small = document.createElement("small");
+    small.textContent = label;
+    const p = document.createElement("p");
+    p.textContent = value || "Not provided";
+    row.append(small,p);
+    $("modalContent").appendChild(row);
+  });
+  $("detailsModal").classList.add("show");
+}
+
+$("closeModal").addEventListener("click",()=>$("detailsModal").classList.remove("show"));
+$("detailsModal").addEventListener("click",event => {
+  if (event.target === $("detailsModal")) $("detailsModal").classList.remove("show");
+});
+
+async function moderate(id, action, button) {
+  const api = pendingApis.find(item => item.id === id);
+  if (!api) return;
+
+  const confirmText = action === "approve"
+    ? "Approve this API and make it publicly discoverable?"
+    : "Reject this API submission?";
+
+  if (!confirm(confirmText)) return;
+
+  button.disabled = true;
+  button.textContent = "Working...";
+
+  try {
+    await request("/api/admin/apis/" + encodeURIComponent(id) + "/" + action, {
+      method:"POST"
+    });
+
+    notify("API " + action + "d successfully.");
+    addActivity(api.name + " was " + action + "d.");
+    await loadDashboard();
+  } catch (error) {
+    notify(error.message,"error");
+    button.disabled = false;
+    button.textContent = action === "approve" ? "Approve" : "Reject";
+  }
+}
+
+function populateCategoryFilters(apis) {
+  const categories = [...new Set(apis.map(api => api.category).filter(Boolean))];
+  ["categoryFilter","catalogCategory"].forEach(id => {
+    const select = $(id);
+    const current = select.value;
+    select.innerHTML = '<option value="">All categories</option>';
+    categories.forEach(category => {
+      const option = document.createElement("option");
+      option.value = category;
+      option.textContent = category;
+      select.appendChild(option);
+    });
+    select.value = current;
+  });
+}
+
+function renderPending() {
+  const query = $("submissionSearch").value.toLowerCase();
+  const category = $("categoryFilter").value;
+
+  const filtered = pendingApis.filter(api => {
+    const text = (api.name + " " + (api.description || "")).toLowerCase();
+    return text.includes(query) && (!category || api.category === category);
+  });
+
+  $("submissionList").replaceChildren();
+
+  if (!filtered.length) {
+    $("submissionList").innerHTML = '<div class="empty">No matching pending submissions.</div>';
+    return;
+  }
+  filtered.forEach(api => $("submissionList").appendChild(renderApiCard(api)));
+}
+
+function renderCatalog() {
+  const query = $("catalogSearch").value.toLowerCase();
+  const category = $("catalogCategory").value;
+  const filtered = catalogApis.filter(api => {
+    const text = (api.name + " " + (api.description || "")).toLowerCase();
+    return text.includes(query) && (!category || api.category === category);
+  });
+
+  $("catalogList").replaceChildren();
+  if (!filtered.length) {
+    $("catalogList").innerHTML = '<div class="empty">No matching marketplace APIs found.</div>';
+    return;
+  }
+  filtered.forEach(api => $("catalogList").appendChild(renderApiCard(api,false)));
+}
+
+async function loadDashboard() {
+  ["overviewPending","submissionList"].forEach(id => {
+    $(id).textContent = "Loading...";
+    $(id).className = "loading";
+  });
+
+  try {
+    const [dashboard,pending] = await Promise.all([
+      request("/api/admin/dashboard"),
+      request("/api/admin/apis/pending")
+    ]);
+
+    dashboardData = dashboard;
+    pendingApis = pending.apis || pending.data || [];
+
+    const counts = dashboard.counts || {};
+    $("pendingCount").textContent = counts.pending ?? 0;
+    $("approvedCount").textContent = counts.approved ?? 0;
+    $("rejectedCount").textContent = counts.rejected ?? 0;
+    $("totalCount").textContent =
+      (Number(counts.approved)||0) + (Number(counts.rejected)||0);
+
+    $("profileName").textContent = dashboard.email || "Administrator";
+    $("profileRole").textContent = dashboard.role || "Admin";
+    $("adminInfo").textContent = dashboard.email || "Administrator";
+    $("securityEmail").textContent = dashboard.email || "Not returned by server";
+    $("securityRole").textContent = dashboard.role || "Not returned by server";
+    $("connectionStatus").textContent = "Connected to DivineAPI backend";
+
+    $("overviewPending").replaceChildren();
+    $("submissionList").replaceChildren();
+
+    if (!pendingApis.length) {
+      $("overviewPending").innerHTML = '<div class="empty">No pending API submissions.</div>';
+    } else {
+      pendingApis.slice(0,3).forEach(api => {
+        $("overviewPending").appendChild(renderApiCard(api));
+      });
+    }
+
+    populateCategoryFilters(pendingApis);
+    renderPending();
+    notify("Dashboard data refreshed.");
+  } catch (error) {
+    $("connectionStatus").textContent = "Unable to verify connection";
+    $("overviewPending").innerHTML = "";
+    $("overviewPending").textContent = error.message;
+    $("submissionList").textContent = error.message;
+    notify(error.message,"error");
+
+    if (error.message.toLowerCase().includes("sign in") ||
+        error.message.toLowerCase().includes("authentication")) {
+      $("adminInfo").textContent = "Please sign in to the DivineAPI marketplace first.";
+    }
+  }
+}
+
+async function loadCatalog() {
+  $("catalogList").textContent = "Loading marketplace APIs...";
+  try {
+    const data = await request("/api/marketplace/apis");
+    catalogApis = data.apis || data.data || [];
+    populateCategoryFilters(catalogApis);
+    renderCatalog();
+  } catch (error) {
+    $("catalogList").textContent = error.message;
+    notify(error.message,"error");
+  }
+}
+
+$("submissionSearch").addEventListener("input",renderPending);
+$("categoryFilter").addEventListener("change",renderPending);
+$("catalogSearch").addEventListener("input",renderCatalog);
+$("catalogCategory").addEventListener("change",renderCatalog);
+
+["topRefresh","overviewRefresh","submissionRefresh","refreshSidebar"].forEach(id => {
+  $(id).addEventListener("click",loadDashboard);
+});
+$("catalogRefresh").addEventListener("click",loadCatalog);
+
+$("menuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+
+$("signOutBtn").addEventListener("click",() => {
+  if (!confirm("Sign out of DivineAPI?")) return;
+  sessionStorage.removeItem("divineapi_token");
+  window.location.href = "index.html";
+});
+
+async function initialise() {
+  if (!token()) {
+    notify("Please sign in to DivineAPI before opening the admin dashboard.","error");
+    $("adminInfo").textContent = "Not signed in.";
+    return;
+  }
+  await loadDashboard();
+}
+
+initialise();
+</script>
+</body>
+</html>
