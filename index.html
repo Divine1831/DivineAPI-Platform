@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d19">
+  <title>DivineAPI — Developer Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">D</span><span>Divine<span class="brand-muted">API</span><small>DEVELOPER CONSOLE</small></span></a>
+    <div class="workspace"><span class="workspace-dot"></span><span><b>Personal workspace</b><small>Free developer plan</small></span><span class="chevron">⌄</span></div>
+    <nav>
+      <p class="nav-label">WORKSPACE</p>
+      <button class="nav-link active" data-page="overview"><span>◫</span> Overview</button>
+      <button class="nav-link" data-page="explorer"><span>⌘</span> API Explorer</button>
+      <button class="nav-link" data-page="docs"><span>▤</span> Documentation</button>
+      <button class="nav-link" data-page="activity"><span>◷</span> Activity <i class="nav-count" id="activityCount">0</i></button>
+      <p class="nav-label nav-spaced">DEVELOPER</p>
+      <button class="nav-link" data-page="account"><span>◎</span> Account</button>
+      <button class="nav-link" data-page="settings"><span>⚙</span> Settings</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="help-card"><span class="help-icon">✦</span><b>Need a hand?</b><p>Explore the docs to learn how to connect your app.</p><button data-page="docs">Open documentation ↗</button></div>
+      <div class="user-mini"><div class="avatar">D</div><span><b>Developer</b><small>DivineAPI user</small></span><button class="dots" aria-label="Account menu">···</button></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Open menu">☰</button>
+      <div class="crumb">Workspace <span>/</span> <b id="crumbPage">Overview</b></div>
+      <div class="top-actions"><span class="connection"><i></i> Production API</span><button class="icon-btn" id="themeToggle" title="Toggle theme">◐</button><button class="top-avatar">D</button></div>
+    </header>
+
+    <section class="page active" id="page-overview">
+      <div class="welcome-row"><div><div class="eyebrow"><span class="pulse"></span> YOUR DEVELOPER WORKSPACE</div><h1>Build something <span>brilliant.</span></h1><p class="subhead">Everything you need to explore and integrate DivineAPI.</p></div><button class="primary-btn" data-page="explorer">＋ Make an API request</button></div>
+      <div class="notice"><span>✦</span><div><b>Welcome to the upgraded DivineAPI console</b><p>Explore endpoints, inspect responses and keep track of your recent requests.</p></div><button id="dismissNotice" aria-label="Dismiss">×</button></div>
+      <div class="section-head"><div><h2>Overview</h2><p>A quick look at your API connection.</p></div><button class="quiet-btn" id="refreshAll">↻ Refresh data</button></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>API STATUS</span><span class="stat-icon green">⌁</span></div><div class="stat-value" id="apiStatus">Checking…</div><div class="stat-foot"><i class="tiny-dot" id="statusDot"></i><span id="statusDetail">Connecting to production</span></div></article>
+        <article class="stat-card"><div class="stat-top"><span>API VERSION</span><span class="stat-icon blue">⌘</span></div><div class="stat-value" id="apiVersion">—</div><div class="stat-foot">Connected service version</div></article>
+        <article class="stat-card"><div class="stat-top"><span>YOUR REQUESTS</span><span class="stat-icon purple">↗</span></div><div class="stat-value" id="requestTotal">0</div><div class="stat-foot">Requests made in this browser</div></article>
+        <article class="stat-card"><div class="stat-top"><span>AVG. RESPONSE</span><span class="stat-icon amber">◷</span></div><div class="stat-value" id="avgResponse">—</div><div class="stat-foot">Based on your request history</div></article>
+      </div>
+      <div class="content-grid">
+        <article class="panel chart-panel"><div class="panel-head"><div><h3>Request activity</h3><p>Your recent API usage</p></div><span class="tag">LOCAL HISTORY</span></div><div class="chart-wrap"><div class="chart-y"><span>Requests</span><span>4</span><span>3</span><span>2</span><span>1</span><span>0</span></div><div class="chart" id="activityChart"><div class="chart-empty">Make a few API requests to see your activity here.</div></div></div><div class="chart-legend"><span><i></i> Requests made</span><span>Last 7 activity days</span></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Quick actions</h3><p>Jump back into building</p></div></div><div class="quick-list"><button data-page="explorer"><span class="quick-icon blue">⌘</span><span><b>Test an endpoint</b><small>Send a request to your API</small></span><strong>→</strong></button><button data-page="docs"><span class="quick-icon purple">▤</span><span><b>Read the docs</b><small>Learn the available routes</small></span><strong>→</strong></button><button data-page="activity"><span class="quick-icon green">◷</span><span><b>View activity</b><small>Review your recent requests</small></span><strong>→</strong></button></div></article>
+      </div>
+      <article class="panel projects-panel"><div class="panel-head"><div><h3>API resources</h3><p>Resources currently exposed by your DivineAPI backend</p></div><button class="quiet-btn" id="reloadProjects">↻ Reload</button></div><div id="projectsList" class="resource-list"><div class="loading-line">Loading resources…</div></div></article>
+    </section>
+
+    <section class="page" id="page-explorer">
+      <div class="page-title"><div class="eyebrow">DEVELOPER TOOLS</div><h1>API <span>Explorer</span></h1><p class="subhead">Build a request, send it to DivineAPI and inspect the response.</p></div>
+      <div class="explorer-layout">
+        <article class="panel request-panel">
+          <div class="panel-head"><div><h3>Request builder</h3><p>Requests are sent directly from your browser.</p></div><span class="tag">LIVE</span></div>
+          <label class="field-label">REQUEST URL</label><div class="url-row"><select id="method"><option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option></select><input id="endpoint" value="/api/status" spellcheck="false"><button class="send-btn" id="sendRequest">Send ↗</button></div>
+          <div class="field-label row-label"><span>HEADERS</span><button class="text-btn" id="addHeader">＋ Add header</button></div><div id="headers" class="headers-list"><div class="header-row"><input value="Accept" aria-label="Header name"><input value="application/json" aria-label="Header value"><button class="remove-header" aria-label="Remove header">×</button></div></div>
+          <label class="field-label body-label" for="requestBody">JSON BODY <span class="optional">OPTIONAL · POST / PUT / PATCH</span></label><textarea id="requestBody" spellcheck="false" placeholder='{&#10;  "example": "value"&#10;}'></textarea>
+          <div class="request-tip"><span>ⓘ</span> Never put private service-role keys or passwords in frontend requests.</div>
+        </article>
+        <article class="panel response-panel"><div class="panel-head"><div><h3>Response</h3><p>Server output appears here.</p></div><button class="quiet-btn" id="copyResponse">Copy</button></div><div class="response-meta"><span class="response-status" id="responseStatus">WAITING</span><span id="responseTime">—</span></div><pre id="responseOutput"><span class="muted-code">// Your response will appear here.</span></pre></article>
+      </div>
+      <div class="panel endpoint-shortcuts"><div class="panel-head"><div><h3>Try a known endpoint</h3><p>These routes are part of the current DivineAPI backend.</p></div></div><div class="endpoint-chips"><button data-endpoint="/api/status">GET <b>/api/status</b></button><button data-endpoint="/api/projects">GET <b>/api/projects</b></button><button data-endpoint="/api/auth/me">GET <b>/api/auth/me</b></button></div></div>
+    </section>
+
+    <section class="page" id="page-docs">
+      <div class="page-title"><div class="eyebrow">LEARN & INTEGRATE</div><h1>API <span>Documentation</span></h1><p class="subhead">A practical guide to the routes currently available in DivineAPI.</p></div>
+      <div class="docs-layout"><aside class="panel docs-nav"><b>GETTING STARTED</b><button class="doc-nav active" data-doc="intro">Introduction</button><button class="doc-nav" data-doc="requests">Making requests</button><b>ENDPOINTS</b><button class="doc-nav" data-doc="status">GET /api/status</button><button class="doc-nav" data-doc="projects">GET /api/projects</button><button class="doc-nav" data-doc="login">POST /api/auth/login</button><button class="doc-nav" data-doc="register">POST /api/auth/register</button><button class="doc-nav" data-doc="reset">POST /api/auth/forgot-password</button></aside><article class="panel doc-content" id="docContent"></article></div>
+    </section>
+
+    <section class="page" id="page-activity">
+      <div class="page-title"><div class="eyebrow">REQUEST MONITOR</div><h1>Activity <span>history</span></h1><p class="subhead">A local record of requests made from this browser.</p></div>
+      <article class="panel"><div class="panel-head"><div><h3>Recent requests</h3><p id="historySubtitle">No requests yet.</p></div><button class="quiet-btn danger-text" id="clearHistory">Clear history</button></div><div class="table-scroll"><table><thead><tr><th>METHOD</th><th>ENDPOINT</th><th>STATUS</th><th>TIME</th><th>WHEN</th></tr></thead><tbody id="historyRows"><tr><td colspan="5" class="empty-cell">Your request history will appear here.</td></tr></tbody></table></div></article>
+    </section>
+
+    <section class="page" id="page-account">
+      <div class="page-title"><div class="eyebrow">DEVELOPER PROFILE</div><h1>Your <span>account</span></h1><p class="subhead">Sign in to access your DivineAPI account.</p></div>
+      <div class="account-grid"><article class="panel account-card"><div class="account-avatar">D</div><h3>DivineAPI developer</h3><p>Account tools connect to your existing API authentication routes.</p><div class="account-actions"><button class="primary-btn" id="showLogin">Sign in</button><button class="secondary-btn" id="showRegister">Create account</button></div><div id="authMessage" class="auth-message"></div></article><article class="panel auth-form" id="authForm"><div class="panel-head"><div><h3 id="authTitle">Sign in</h3><p id="authDescription">Use your DivineAPI account details.</p></div></div><label class="field-label" for="authEmail">EMAIL</label><input class="form-input" id="authEmail" type="email" autocomplete="email" placeholder="you@example.com"><label class="field-label" for="authPassword">PASSWORD</label><input class="form-input" id="authPassword" type="password" autocomplete="current-password" placeholder="Your password"><div id="usernameWrap" class="hidden"><label class="field-label" for="authUsername">USERNAME</label><input class="form-input" id="authUsername" placeholder="Choose a username"></div><button class="primary-btn full-btn" id="authSubmit">Sign in</button><button class="text-btn" id="forgotPassword">Forgot password?</button><div class="auth-warning">Use your own account. Never share your password or verification codes.</div></article></div>
+    </section>
+
+    <section class="page" id="page-settings">
+      <div class="page-title"><div class="eyebrow">PREFERENCES</div><h1>Console <span>settings</span></h1><p class="subhead">Personalize this browser's developer console.</p></div>
+      <article class="panel settings-panel"><div class="setting-row"><div><b>Appearance</b><p>Switch between dark and light themes.</p></div><button class="secondary-btn" id="settingsTheme">Toggle theme</button></div><div class="setting-row"><div><b>Request history</b><p>History is stored locally in this browser only.</p></div><button class="secondary-btn" id="settingsClear">Clear local history</button></div><div class="setting-row"><div><b>API connection</b><p id="apiBaseText">https://divine-api-seven.vercel.app</p></div><button class="secondary-btn" id="testConnection">Test connection</button></div></article>
+    </section>
+    <footer>© <span id="year"></span> DivineAPI <span>·</span> Built for developers</footer>
+  </main>
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
